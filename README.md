@@ -5,7 +5,7 @@ To make this project work, as is, you'll need to modify the Makefile to point at
 
 ## Shout-outs
 
-Check out the [ARM-programming workshop](https://github.com/muccc/arm-workshop).  Except for the Makefile, I basically copied everything straight from that project.  That should compile for you straight out of the gate.
+Check out the [ARM-programming workshop](https://github.com/muccc/arm-workshop).  Except for the Makefile, I basically copied everything from that project.  That should compile for you straight out of the gate.
 
 ## Going Further?
 
