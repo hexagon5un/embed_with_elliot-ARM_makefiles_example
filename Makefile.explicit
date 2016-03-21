@@ -1,0 +1,54 @@
+## Cross-compilation commands 
+CC      = arm-none-eabi-gcc
+LD      = arm-none-eabi-gcc
+AR      = arm-none-eabi-ar
+AS      = arm-none-eabi-as
+OBJCOPY = arm-none-eabi-objcopy
+OBJDUMP = arm-none-eabi-objdump
+SIZE    = arm-none-eabi-size
+
+# our code
+OBJS  = main.o
+# startup files and anything else
+OBJS += handlers.o startup.o
+
+## Platform and optimization options
+CFLAGS = -c -fno-common -Os -g -mcpu=cortex-m4 -mthumb 
+CFLAGS += -Wall -ffunction-sections -fdata-sections -fno-builtin
+CFLAGS += -Wno-unused-function -ffreestanding
+LFLAGS = -Tstm32f4.ld -nostartfiles -Wl,--gc-sections
+
+## Library headers
+CFLAGS += -I./ 
+CFLAGS += -I/usr/local/lib/CMSIS/Include/
+CFLAGS += -I/usr/local/lib/STM32F4xx_HAL_Driver/Inc/
+CFLAGS += -I/usr/local/lib/CMSIS/Device/ST/STM32F4xx/Include/
+
+## Library objects
+OBJS += /usr/local/lib/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o
+OBJS += /usr/local/lib/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o
+OBJS += /usr/local/lib/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
+OBJS += /usr/local/lib/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
+OBJS += /usr/local/lib/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.o
+
+## Rules
+all: main.bin size flash
+
+%.bin: %.elf
+	$(OBJCOPY) --strip-unneeded -O binary $< $@
+
+main.elf: $(OBJS) stm32f4.ld
+	$(LD) $(LFLAGS) -o main.elf $(OBJS)
+
+## Convenience targets
+
+flash: main.bin
+	st-flash --reset write $< 0x8000000 
+
+size: main.elf
+	$(SIZE) $< 
+
+clean:
+	-rm -f $(OBJS) main.lst main.elf main.hex main.map main.bin main.list
+
+.PHONY: all flash size clean 
